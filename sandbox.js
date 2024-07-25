@@ -713,6 +713,12 @@ processUserInput(greeting);
   //asynchronous callbacks - executed after synchronous callbacks
     //FETCH
 
+    //Standard Fetch
+    fetch('https://jsonplaceholder.typicode.com/todos/1')
+      .then(rawResponse => rawResponse.json())
+      .then(jsonifiedResponse => console.log("Jsonified data: ", jsonifiedResponse))
+      .catch(error => console.log(error))
+
 let url =
 let secondUrl =
 let dataReturned = []
@@ -1236,6 +1242,38 @@ machine.addSnack({name: 'Chocolate Bar', price: 2.5});
 machine.addSnack({name: 'Potato Chips', price: 1.5});
 VendingMachine.buySnack({name: 'Potato Chips', price: 1.5});
 
+//STATIC METHOD
+class Car {
+  constructor(make, model, maxSpeed) {
+    this.make = make;
+    this.model = model;
+    this.maxSpeed = maxSpeed;
+  }
+
+  move(location) {
+    console.log(`Speeding along to ${location}`);
+  }
+
+  description() {
+    console.log(`${this.make} ${this.model}`);
+  }
+
+  increaseMaxSpeed(speedIncrease) {
+    this.maxSpeed += speedIncrease;
+  }
+//IMPLEMENT a static method that returns true if the object is an instance 
+//of a car, else return FALSE
+  static isCar(obj) {
+    return obj instanceof Car;
+  }
+}
+// Example usage
+const car1 = new Car('Toyota', 'Corolla', 150);
+const notACar = { make: 'Tesla', model: 'Model S', maxSpeed: 200 };
+
+console.log(Car.isCar(car1)); // Output: true
+console.log(Car.isCar(notACar)); // Output: false
+
 
 // MAY 21 TDD
 //SAMPLE
@@ -1419,3 +1457,1291 @@ beforeEach(() => {
     expect(vendingMachine.customerFunds).toBe(0);
   })
 });
+
+//REACT 29 May 2024
+
+import React from 'react';
+import ReactDOM from 'react-dom';
+
+const numberArray =[1,2,3,4];
+const list = <ul>
+              {numberArray.map(num=> <li key = {num}>{num}</li>)} //map method
+             </ul>
+ReactDOM.render(list, document.getElementbyID ('root'))
+
+  //conditional rendering
+  const Greeting = (name) => {
+    // assume isDaytime returns true if it is currently day time (whatever that means)
+    if (isDaytime()) {
+      return (
+        <h1>Hello {name}!</h1>
+      );
+    }
+    else {
+      return (
+        <h1>Good evening {name}!</h1>
+      );
+    } 
+  }
+
+  //sample
+  //Improper rendering if-else statement:
+  const GuitarName = (guitarName) => {
+  
+    return ( 
+      <>
+        <h1>Guitar Name</h1>
+        {
+          if (guitarName === undefined) { //incorrect
+            return <p>Unknown</p>
+          }
+          else
+          {
+            return <p>{guitarName}</p>
+          }
+        }
+      </>
+    );
+  }
+  
+  //correct:
+  import React from 'react';
+
+const GuitarName = (guitarName) => {
+  
+  return ( 
+    <>
+      <h1>Guitar Name</h1>
+      <p>{guitarName === undefined ? 'Unknown' : guitarName}</p>
+    </>
+  );
+}
+
+export default GuitarName;
+
+//parts of JSX
+//classRoster = parent; student = child
+//firstName and lastName = props or attributes
+<ClassRoster>
+<Student firstName="Bill" lastName="Madison" />
+<Student firstName="Becky" lastName="Smith" />
+<Student firstName="Michael" lastName="Richards" />
+</ClassRoster>
+
+//PROPS
+// if you define a component like this...
+const UserInformation = (props) => (
+  <span>Hello {props.firstName} {props.lastName}. You live in {props.city}, {props.state}</span>
+);
+
+// and you render it like this, with HTML attributes that correspond to the property names in `props`
+<UserInformation firstName="Rowan" lastName="Wyatt" city="Oakland" state="California" />
+
+// the resulting DOM will look like this...
+<span>Hello Rowan Wyatt. You live in Oakland, California</span>
+
+//correct syntax for passing the JSX element the following props object
+<Person />
+<Person id={43} firstName="Michelle" lastName="Obama" />
+
+//STATE
+
+//SAMPLE PROBLEM:
+//Given the stateless functional component TimestampFormatter below:
+
+import React from 'react'
+
+const TimestampFormatter = (props) => {
+    return (
+        <span>
+            {props.date.toLocaleString("en-US",
+                { timeZone: props.timeZone }
+            )}
+        </span>
+    )
+}
+
+export default TimestampFormatter
+
+//Complete the implementation of the GalvanizeTimes class component in such a way that:
+  // clicking on a city updates the timeZone state field
+  // GalvanizeTimes renders the TimestampFormatter component with the appropriate timeZone and date.
+
+import React from 'react'
+import TimestampFormatter from './TimestampFormatter'
+
+const cityTimeZones = [
+    ['New York', 'America/New_York'],
+    ['Denver', 'America/Denver'],
+    ['Phoenix', 'America/Phoenix'],
+    ['Los Angeles', 'America/Los_Angeles']
+]
+
+export default class GalvanizeTimes extends React.Component {
+    constructor() {
+        super();
+        this.state = {
+            date: new Date(),
+            timeZone: 'America/New_York'
+        }
+    }
+    //TODO: implement setTimeZone
+    setTimeZone (timeZone) {//takes a timeZone parameter and sets the state correctly
+        this.setState({
+            timeZone: timeZone
+        })
+    }
+
+    render() {
+        const clickableCities = cityTimeZones.map(cityTZ => {
+            return (
+                <a  key={cityTZ[0]}
+                    id={cityTZ[0]}
+                    onClick={() => this.setTimeZone(cityTZ[1])}>
+                    {cityTZ[0]}
+                </a>
+            )
+        })
+
+        return (
+            <div>
+                <h1>Click on a city to see what time it is</h1>
+                {clickableCities}
+                {/* TODO: render TimestampFormatter component*/}
+                <TimestampFormatter //Pass the date and timeZone from the state to the TimestampFormatter component.
+                    date={this.state.date}
+                    timeZone={this.state.timeZone}
+                    />
+            </div>
+        )
+    }
+
+    //LIFECYCLE componentDidMount
+// create a component that shows the Astronomy Picture of the Day from NASA, 
+//you would send a request to that API in componentDidMount and save to state.
+    class AstronomyPic extends React.Component {
+      constructor() {
+        this.state = {
+          //initial state contains a pictureData property given an object with predetermined properties
+          // as its value to show that it will eventually contain an object with more data.
+          pictureData: {
+            apod_site: '',
+            copyright: '',
+            date: '',
+            description: '',
+            hdurl: '',
+            media_type: '',
+            title: '',
+            url: ''
+          }
+        }
+      }
+    }
+      componentDidMount() {
+        fetch('https://apodapi.herokuapp.com/api')
+          .then(res => res.json())
+          .then(data => {
+            this.setState({
+              pictureData: data
+            })
+          })
+      }
+
+  //HOOKS
+  //useState
+  //classical React:
+
+  import React from 'react';
+
+//classical implementation
+class Greeting extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      greeting: '',
+      list: [],
+    };
+  }
+  /* Other Stuff */
+}
+
+//useState HOOK
+import React, { useState } from 'react';
+
+const Greeting = () => {
+   const [greetingState, setGreetingState] = useState( '' );
+   const [listState, setListState] = useState( [] );
+}
+
+//example classical component vs useState HOOK:
+import React, { useState } from 'react';
+
+const Car = () => {
+  //useState hook
+  return (
+    <div id='car'>
+      <h2>{car.name}</h2>
+      <div id='specs'>
+        <h3>Specs</h3>
+        <ul>
+          <li>Horsepower: {car.specs.horsepower}</li>
+          <li>0-60: {car.specs.timeTo60}</li>
+          <li>MSRP: ${car.specs.price}</li>
+        </ul>
+      </div>
+    </div>
+  )
+}
+
+//VS. useState HOOK:
+//useState allows you to set 2 variable:
+// a piece of state (car) and a function to update it (setCar)
+const [car, setCar] = useState({ // setCar is similar to 'setState'
+//like setState, the set... function from useState is also required to change state as it is immutable
+  name: '',
+  specs: {
+    horsepower: 0,
+    timeTo60: 0,
+    price: 0
+  }
+})
+
+//PRACTICE useState and useEffect
+//CAT.js
+import React, { useState, useEffect } from 'react';
+const Cat = ({ url }) => {
+  useEffect(() => {
+    .then(res=> res.json())
+    .then(data => SecurityPolicyViolationEvent(data))
+  }, [url])
+  return (
+    <div>
+      <img src={catch.url} alt={catch.id} style= {{'width': '400px'}}/>
+    </div>
+  )
+}
+export default Cat
+
+//App.js
+import React from 'react';
+import Cat from './Cat';
+
+constApp = () => {
+  const [url, setUrl] = useState ('https://thatcopy.pw/catapi/restId/1');
+  const randomCat = () => {
+    let randomNum =Math.floor (Math.random() * (58-1) +1);
+    setUrl(`https://thatcopy.pw/catapi/restId/${randomNum}`)
+  }
+  return(
+    <div>
+      <Cat url = {url} />
+      <button onClick={randomCat}>Click for random cat</button>
+    </div>
+  )
+}
+export default App
+
+//useContext example
+export const ColorContext = React.createContext();
+
+function App() {
+    const colors = {
+        pink: "#0482f",
+        orange: "#8c8F0s",
+        teal: "#0384b1"
+    }
+
+    return (
+        <ColorContext.Provider value={colors}>
+            <Home />
+        </ColorContext.Provider>
+  );
+}
+//exercise
+
+//04 June React Routers
+//wrap provider around
+//svg icons
+
+//BrowserRouter
+import * as React from "react";
+import { createRoot } from "react-dom/client";
+import { BrowserRouter as Router } from "react-router-dom";
+//rename the alias of BrowserRouter to Router to make it a little more semantic to read.
+import App from './App'
+
+const root = createRoot(document.getElementById("root"));
+
+root.render(
+  <Router>
+    <App />
+  </Router>,
+  document.getElementById('root')
+)
+
+//HashRouter
+import * as React from "react";
+import * as ReactDOM from "react-dom";
+import { HashRouter } from "react-router-dom";
+import App from './App';
+
+ReactDOM.render(
+  <HashRouter>
+    <App />
+  </HashRouter>
+);
+
+//switch statement:
+// routerFunction(url){
+//   switch(url.path){
+//     case `cat` : return <CatComponent />;
+//     case `dog` : return <DogComponent />;
+//     case `gerbil` : return <GerbilComponent />;
+//   }
+  //Router is like a switch statement:
+//   <Router>
+//     <Routes>
+//     // Route components can only exist in 'Routes' wrapper
+//       <Route path="/cat" element={<CatComponent/>}/>
+//       <Route path="/dog" element={<DogCompnent/>}/>
+//       <Route path="/gerbil" element={<GerbilComponent/>}/>
+//     </Routes>
+// </ Router>
+
+//practice
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+
+const Home = () => (
+  <h1>Home</h1>
+)
+const UserProfile = () => (
+  <h1>User Profile</h1>
+)
+const Signup = () => (
+  <h1>Sign up</h1>
+)
+ const App = () => (
+<Router>
+{/* unordered list */}
+  <ul> 
+    <li>
+      <Link to ='/'>Home</Link>
+    </li>
+    <li>
+      <Link to ='/profile'>User Profile</Link>
+    </li>
+    <li>
+      <Link to ='/signup'>Sign Up</Link>
+    </li>
+  </ul>
+    <Routes>
+      <Route path="/" element={<Home/>}/>
+      <Route path="/profile" element={<UserProfile/>}/>
+      <Route path="/signupl" element={<Signup/>}/>
+    </Routes>
+</ Router>
+ )
+ export default App;
+
+//Dynamic routes
+//  <Routes>
+//   <Route path="/details/:id" element={<Details product={product}/>}/>
+// </Routes>
+
+//   //providing parameters
+//   <Link to={`/details/${item.id}`}>
+//     <img src={item.img} />
+//   </Link>
+
+  //practice - Dynamic routes (from tutorial video)
+  import React, { useState } from 'react';
+  import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+
+  const Details = ({ product }) => (
+    <div>
+      {product.name} : ${product.price}
+      <img src={product.image} alt={product.name} style={{width: '400px'}} />
+    </div>
+  );
+  const App = () => {
+    const [details, setDetails] = useState ({id: '', name: '', price: '', image: ''})
+    const product1 = {
+      id: '1',
+      //add a parameter id (good for when managing many products)
+      name: 'apples',
+      price: '2.00',
+      image: 'some URL'
+    }
+    const product2 = {
+      id: '2',
+      name: 'oranges',
+      price: '3.00',
+      image: 'some URL'
+    }
+    const data = [product1, product2]
+    return (
+      <Router>
+        <ul>
+          {data.map(item => (
+            <li key={item.id}>
+              <Link to={`/details/${item.id}`} onClick={()=> {setDetails(item)}}>{item.name}</Link>
+            </li>
+          ))}
+        </ul>
+        <Routes>
+          <Route path='/' element ={<div>Home</div>}/>
+          <Route path="/details/:id" element={<Details product={details}/>}/>
+        {/* <Route path="/details/1" element={<Details product={product1}/>}/>
+        <Route path="/details/2" element={<Details product={product2}/>}/> */}
+        </Routes>
+      </Router>
+    )
+  }
+  export default App;
+
+  //You Do - dynamic routes
+
+  import React, { useState, useEffect, useContext } from 'react';
+  import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+  
+  const UserContext = React.createContext({user: {}, setUser: () => {}});
+
+   const App = () => {
+    const [data, setData] = useState([])
+    const [user, setUser] = useState({
+      name: {
+        first: '',
+        last: '',
+        title: '',
+      },
+      location: {
+        street: {
+          number: '',
+          name: '',
+        }
+        city: '',
+        state: '',
+        postcode: '',
+      }
+    })
+    useEffect(() => {
+      fetch('https://randomuser.me/api/?results=5')
+      .then(res => res.json())
+      .then(data => setData(data.results)) //this will retrive data in API list
+    }, [])
+    const value = { user, setUser }
+    return (
+      <Router>
+        <UserContext.Provider value={value}>
+        <Routes>
+          <Route path='/' element={<List list={data}/>}/>
+          <Route path='/:username' element={<Details />} />
+        </Routes>
+        </UserContext.Provider>
+      </Router>
+    )
+   }
+
+   const List = ( { list }) => (
+    <ul>
+      {list.map(user => (
+        <User user={user}/>
+      ))}
+    </ul>
+   )
+  
+   const User = ({ user }) => {
+    const { setUser } = useContext(UserContext);
+    return(
+      <Link to={`/${user.login.username}`}>
+      <li onClick={() => {setUser(user)}}>
+        {user.name.first} {user.name.last}
+      </li>
+      </Link>
+    )
+   }
+   const Details =() => {
+    const { user } = useContext(UserContext);
+    return (
+      <div>
+        <div>
+          Name: {user.name.title} {user.name.first} {user.name.last}
+        </div>
+        <div>
+          Address: {user.location.street.number} {user.location.street.name} {user.location.city}, {user.location.state}, {user.location.postcode}
+        </div>
+      </div>
+    )
+   }
+   export default App;
+
+//useNavigate HOOK
+//'hidden' until revealed
+import React from 'react';
+    //for 'state' import 'useLocation'
+import { Routes, Route, Link, useNavigate, useLocation } from 'react-router-dom';
+// in index.js, 'import { BrowserRouter as Router } from 'react-router-dom';
+
+const App = () => {
+  const navigate = useNavigate();
+  //navigate variable gives us access to using 'useNavigate' within our Router
+  const location = useLocation();
+    //instatiate 'location' for 'state'
+    console.log(location.state)
+  return (
+//and wrap '<App/> in <Router> instance; in App.js replace <Router> with empty <> React fragments:
+    <>
+    <ul>
+      <li>
+        <Link to='/'>Home</Link>
+      </li>
+      <li>
+        <Link to='/user'>User</Link>
+      </li>
+    </ul>
+    {/* <button onClick={()=> {navigate('/signup', {replace: true})}}>Sign Up</button> */}
+    {/* replace 'replace' with state to pass in some state and log it out */}
+    <button onClick={()=> {navigate('/signup', {state: {data: 'some data'}})}}>Sign Up</button>
+    <Routes>
+      <Route path='/' element={<hi>Home</hi>}/>
+      <Route path='/' element={<hi>Home</hi>}/>
+    </Routes>
+    </>
+  )
+}
+export default App;
+
+//React - bring style she into the JSX file
+/* App.js */
+import './appStyles.css'
+import {Component} from 'react'
+
+class App extends Component {
+    constructor(props){
+        super(props)
+    }
+}
+
+//use 'className' in JSX:
+/* App.jsx */
+// const App = (props)=>return ( <div className="menu" id="account-menu">)
+//OR instead of using 'classNames', create a separate .css file for a give component:
+
+    /* ./Button.module.css */
+    .button {
+      color: "white";
+      padding: 10%;
+      border: "orange";
+      background-color: "grey"
+      ...
+    }
+
+    /* Button.jsx */
+    import styles from './Button.module.css'
+
+    const Button = () => {
+        return (
+          <div>
+            <button className={styles.button}>Click Me!</button>
+          </div>
+        );
+    }
+//MUI
+import React from 'react';
+import Paper from '@mui/material/Paper';
+//'Paper' component generally used as the main container for the app's content
+// or
+import { Paper } from '@mui/material';
+
+const style = {
+  margin: 20
+};
+
+const NewPaper = () => (
+  <Paper sx={style} />
+)
+//applying a custom margin by passing the style object in using the sx prop. 
+//The sx prop allows us to easily make one-off changes by utilizing CSS-in-JS to apply styling objects.
+export default NewPaper;
+
+//The Container prop is the most basic layout component offered by MUI. 
+//Under the hood it is basically a <div> that centers content horizontally.
+import { Container } from '@mui/material';
+
+const style = {
+  color: lightgrey,
+  border: 2px solid black
+}
+
+const NewContainer = () => (
+  <Container maxWidth='md' sx={style}>
+    Content to be displayed centered horizontally.
+  </Container>
+)
+
+// 10 June 2024
+// TDD REACT
+
+    //SAMPLE from video demo:
+
+      //App.js
+      import React from 'react';
+      import UserProfile from './UserProfile';
+
+      const App = () => (
+        <div id='App'>
+          <UserProfile user = 'Jim' email = 'jim@galvanize.com' />
+          </div>
+      )
+      export default App;
+
+      //App.test.js
+      import { render } from '@testing-library/react';
+
+      import App from './App'
+
+      describe ('App', () => {
+        it ('renders a user profile', () => {
+          const app = render (<App />);
+          const user = app.getByText('Name: Jim');
+          const email = app.getByText('Email: jim@galvanize.com');
+          expect(user).toBeInTheDocument();
+          expect(email).toBeInTheDocument();
+        })
+      })
+
+      //UserProfile.js
+      import React from 'react';
+
+      const UserProfile = (props) => (
+          <div>
+              <h1>User Profile</h1>
+              <div>Name: {props.user}</div>
+              <div>Email: {props.email}</div>
+          </div>
+      )
+
+      export default UserProfile;
+
+      //PRACTICE PROBLEM:
+
+            //Given the stubbed API response below,
+
+      [
+        {firstName: "George", lastName: "Washington", homeroom: "A"},
+        {firstName: "Matthew", lastName: "Damon", homeroom: "B"},
+        {firstName: "Mariah", lastName: "Carey", homeroom: "C"}
+      ]
+      // Write a unit test for the StudentList component 
+      // (that contains an http call) and verifies the list items rendered.
+
+      import React from 'react';
+
+      export default class StudentList extends React.Component {
+        constructor(props) {
+          super();
+          this.state = {
+            students: []
+          }
+        }
+
+        componentDidMount() {
+          fetch('/api/students')
+          .then(response => response.json())
+          .then(students => this.setState({ students: students }))
+        }
+
+        render() {
+          return (
+            <ul>
+              {this.state.students.map((student, index) => <li key={index}>{student.firstName} {student.lastName}</li>)}
+            </ul>
+          )
+        }
+      }
+
+      //StudentList.test.js
+
+        import React from 'react';
+        import { rest } from 'msw';
+        import { setupServer } from 'msw/node';
+        import { render, screen, waitFor } from '@testing-library/react';
+        import StudentList from './StudentList';
+
+        const server = setupServer(
+          rest.get('/api/students', (req, res, ctx) => {
+            return res(ctx.json([
+              {firstName: "George", lastName: "Washington", homeroom: "A"},
+              {firstName: "Matthew", lastName: "Damon", homeroom: "B"},
+              {firstName: "Mariah", lastName: "Carey", homeroom: "C"}
+            ]));
+          })
+        );
+
+        beforeAll(() => server.listen());
+        afterEach(() => server.resetHandlers());
+        afterAll(() => server.close());
+        
+        it('should populate student entry on state after a successful API call', async () => {
+          render(<StudentList/>);
+          
+          await waitFor(() => {
+            expect(screen.getByText('George Washington')).toBeInTheDocument();
+            expect(screen.getByText('Matthew Damon')).toBeInTheDocument();
+            expect(screen.getByText('Mariah Carey')).toBeInTheDocument();
+          });
+        });
+
+//11 June 2024
+//Mocking API Calls in React Tests with Jest
+
+// UserList.js
+import React, { useState, useEffect } from 'react';
+
+const UserList = () => {
+  const [users, setUsers] = useState([]);
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  const fetchUsers = async () => {
+    try {
+      const response = await fetch('https://api.example.com/users');
+      const data = await response.json();
+      setUsers(data);
+    } catch (error) {
+      console.error('Error fetching users:', error);
+    }
+  };
+
+  return (
+    <div>
+      <h1>User List</h1>
+      <ul>
+        {users.map(user => (
+          <li key={user.id}>{user.name}</li>
+        ))}
+      </ul>
+    </div>
+  );
+};
+
+export default UserList;
+
+// UserList.test.js
+import React from 'react';
+import { render, screen, waitFor } from '@testing-library/react';
+import UserList from './UserList';
+
+test('renders user list', async () => {
+  // Mock the fetch function
+  global.fetch = jest.fn(() =>
+    Promise.resolve({
+      json: () => Promise.resolve([{ id: 1, name: 'Alice' }, { id: 2, name: 'Bob' }])
+    })
+  );
+
+  render(<UserList />);
+
+  // Wait for the component to fetch data
+  await waitFor(() => {
+    const userList = screen.getByText(/user list/i);
+    expect(userList).toBeInTheDocument();
+
+    const user1 = screen.getByText(/alice/i);
+    expect(user1).toBeInTheDocument();
+
+    const user2 = screen.getByText(/bob/i);
+    expect(user2).toBeInTheDocument();
+  });
+});
+
+
+//13 June
+//Day 2 Project 2
+  //REACT FETCH
+//PlanetInfo.js
+import React from 'react';
+import { useState, useEffect } from 'react';
+
+const PlanetInfo = ({ planetId, setShowPlanetInfo, showPlanetInfo }) => {
+  const [planetData, setPlanetData] = useState(null);
+
+  //by Tiffany
+  useEffect(() => {
+    if (planetId) {
+      fetch(`https://swapi.dev/api/planets/${planetId}/`)
+        .then(res => res.json())
+        .then(data =>
+          setPlanetData(data)); //this will retrive data in API list
+      // .catch(error => console.error('Error fetching planets:', error));
+    }
+  }, [planetId]);
+
+  //by Tiffany
+
+  //because it takes a ~milisecond of time to load, it's import to have an if statement that
+  //handles the "loading" state
+  if (planetData === null) {
+    return (
+      <p>
+        ...Loading
+      </p>
+    )
+  }
+  const handleClick = () => {
+    setShowPlanetInfo(!showPlanetInfo);
+  }
+
+  return (
+    <div onClick={handleClick} style={{ position: 'absolute', top: 20, right: 20, padding: '20px', backgroundColor: 'rgba(255, 255, 255, 0.8)' }}>
+      <h2>{planetData.name}</h2>
+      <p>Planet ID: {planetId}</p>
+      <p>Orbital Period: {planetData.orbital_period} days</p>
+      <p>Rotation Period: {planetData.rotation_period} hours</p>
+      <p>Climate: {planetData.climate}</p>
+      <p>Terrain: {planetData.terrain}</p>
+      <p>Gravity: {planetData.gravity}</p>
+      <p>Surface Water: {planetData.surface_water}</p>
+      <p>Population: {planetData.population}</p>
+      <p>Diameter: {planetData.diameter}</p>
+      {/* <p>Characters: {planetData.residents.map(x => <p>{x}</p>)}</p> */}
+      {/* {x} is each element in the array and requires <p> tags to be displayed */}
+    </div>
+  );
+};
+
+export default PlanetInfo;
+
+//SERVER SIDE 18 JUNE
+//More examples are saved in 'CODE-ALONG' in dir 'SERVERSIDE'
+
+//CHECKPOINT
+//1 - Write an asynchronous fs.readFile() that reads from data.txt in utf8 
+//and have the callback write the result to console.log().
+
+//fs is already required, you don't need to require it
+
+  // Read file asynchronously, callback function is called eventually
+  fs.readFile('data.txt', 'utf8', (err, data) => {
+    if (err) throw err;
+    console.log(data);// can see the index.html file text in console
+});
+
+//2 - Write an asynchronous fs.writeFile() that writes the string Hello World! 
+//to a file named hello-world.txt. 
+//If there is an error, it should log the error to the console for debugging.
+
+//fs is already required, you don't need to require it
+fs.writeFile('hello-world.txt', 'Hello World!', function (error) {
+    if (error) {
+    console.log(error);
+    }
+    })
+
+
+    function myFunction(fileName){
+      // Use the below methods in your code 
+      //(you will need to change the passed in parameters)
+      // Hint: the newline character used in this test is \n
+      //Reads an input file and returns the contents as a string
+      let data = fs.readFileSync(fileName, 'utf8');
+  
+      let lines = data.split('\n');
+  
+      let capitalizedFullName = lines.map(line => {
+          let fullName = line.split(' ');
+          let capitalizedName = fullName.map(name =>
+              `${name[0].toUpperCase()}${name.slice(1)}`
+          );
+          return capitalizedName.join(' ');
+      });
+      let newContent = capitalizedFullName.join('\n');
+      //writes the contents to a file
+      fs.writeFileSync(fileName, newContent, 'utf8');
+    
+    }
+    // myFunction('names.txt');
+
+    function myFunction(csvFileName) {
+      // Read the CSV file synchronously and get its content as a string
+      let csvData = fs.readFileSync(csvFileName, 'utf8');
+    
+      // Split the CSV content into an array of lines
+      let lines = csvData.split('\n');
+    
+      // Extract the headers from the first line
+      let headers = lines[0].split(',');
+    
+      // Parse the CSV lines into objects
+      let jsonObjects = lines.slice(1).map(line => {
+        let values = line.split(',');
+        let obj = {};
+        headers.forEach((header, index) => {
+          obj[header.trim()] = values[index].trim();
+        });
+        return obj;
+      });
+    
+      // Convert the objects array to a JSON string
+      let jsonString = JSON.stringify(jsonObjects, null, 2);
+    
+      // Write the JSON string to a new file with .json extension
+      let jsonFileName = csvFileName.replace('.csv', '.json');
+      fs.writeFileSync(jsonFileName, jsonString, 'utf8');
+    
+      // Delete the original CSV file
+      fs.unlinkSync(csvFileName);
+    }
+    
+    // Call the function with the CSV filename
+    // myFunction('input.csv');
+
+    //API Servers - 21 June
+      //mkdir - 21June
+    
+
+//26 June
+//SQL
+//Select the name and capitals of all states in ascending order of the land area 
+//of the state that have a state bird in the following list:
+
+// American Robin
+// Mockingbird
+// Eastern Bluebird
+
+    // SELECT name, capital
+    // FROM states
+    // WHERE state_bird 
+    // IN ('American Robin', 'Mockingbird', 'Eastern Bluebird')
+    // ORDER BY land_area;
+
+// Select the capitals of all states that have land area less than 2 times their water area.
+
+    // SELECT capital FROM states
+    // WHERE land_area < 2 * water_area;
+
+// total_area is not a column in the states table - this won't be a problem 
+//since you can make use of addition with + and some sorting...
+// Select all of the data for all states, in descending order of their total area.
+
+    // SELECT * FROM states
+    // ORDER BY land_area + water_area DESC;
+
+// James K. Polk was the President of the United States from March 4th, 1845 to March 4th, 1849. 
+// One particular state joined the union one day before he entered office...
+
+// Select the name as early_bird of that state.
+
+    // SELECT name AS early_bird
+    // FROM states
+    // WHERE join_date = '1845-03-03';
+
+//Select the names as state and state birds as bird from all states that have a water area greater 
+//than or equal to 3000km^2 OR a land area less than or equal to 3000km^2.
+
+// SELECT name AS state,
+//     state_bird AS bird
+// FROM states
+// WHERE water_area >= 3000
+//     OR land_area <= 3000;
+
+// Delaware was the first state to join the Union, doing so on December 7th of 1787.
+  // Select the names as state and capitals of all states that joined the union before January 1st of 1800.
+  // SELECT capital, name AS state
+  // FROM states
+  // WHERE join_date BETWEEN '1787-12-07' AND '1800-01-01'
+  // ORDER BY join_date;
+
+  // Select the state birds as recent_state_birds from all states 
+  // that joined the union between January 1st of 1900 and right now.
+
+  // SELECT state_bird AS recent_state_birds
+  // FROM states
+  // WHERE join_date BETWEEN '1900-01-01' AND NOW();
+
+  // Select the name as state and total of water and land area as total_area 
+  // of the ten largest states by total area in descending order.
+
+    // SELECT name AS state,
+    //   (water_area + land_area) AS total_area
+    // FROM states
+    // ORDER BY total_area DESC 
+    // LIMIT 10;
+
+// Select the quantity of states that have names beginning with A.
+
+// SELECT COUNT(name)
+// FROM states
+// WHERE name LIKE 'A%';
+
+//or using LEFT:
+//SELECT COUNT(*) AS begin_with_a FROM states WHERE LEFT(name,1) LIKE 'A';
+
+// Select all data for all states that have USPS two-letter codes that are the 
+// same two letters as the first two letters of their name.
+
+// SELECT * FROM states
+// WHERE LEFT(usps_code,2)
+// ILIKE LEFT(name,2);
+
+//or -- SELECT * FROM states WHERE LEFT(name,2) ILIKE usps_code;
+
+// James K. Polk was the President of the United States from March 4th, 1845 to March 4th, 1849.
+
+// Select the quantity of states that joined the union during his presidency as polk_states.
+// SELECT COUNT(*) AS polk_states
+// FROM states
+// WHERE join_date BETWEEN '1845-03-04' AND '1849-03-04';
+
+// Select the name of the state Alabama, but replace all of the lower case as with 4s.
+
+// SELECT REPLACE(name, 'a', '4')
+// FROM states
+// WHERE name = 'Alabama';
+
+// What would you do if you wanted to replace more than one thing? REPLACE only lets you do one replacement at a time...
+
+// Select the names of all states but for any states whose names contain lowercase s, 
+// (i.e. s) replace with 5 and for any lower-case p (i.e. p) replace with the symbols |>. If you succeed, 
+// you'll return 50 rows however Mississippi , for example, should become Mi55i55i|>|>i
+
+// SELECT REPLACE(
+// REPLACE(name, 'p', '|>'
+// ), 's', '5')
+// FROM states
+// -- WHERE name = 'Mississippi';
+
+// All of the water areas for the states are given in square kilometers. 
+// For all states, select the name and the water area as square miles, rounded, as water_area_sq_mi 
+// and the original water area as water_area_sq_km, in descending order of water area.
+
+// To convert any number of square kilometers to square miles, divide it by 2.59.
+
+// SELECT name,
+//         water_area AS water_area_sq_km,
+//         ROUND(water_area/2.59) AS water_area_sq_mi
+// FROM states
+// ORDER BY water_area DESC;
+
+// Take the conversion a step further and get some total areas for the states. 
+// The total area is the sum of the water and land areas.
+
+// Select the names of all states, the rounded total area in square miles as total_sq_mi, 
+// and the total area in square kilometers as total_sq_km. 
+// The results should be sorted in descending order of the total area.
+
+// SELECT name,
+//         (water_area + land_area) AS total_sq_km,
+//         ROUND((water_area + land_area)/2.59) AS total_sq_mi
+// FROM states
+// ORDER BY total_sq_mi DESC;
+
+// There are a number of state birds that are repeats.
+
+// Select a list of all unique state birds.
+
+//   SELECT DISTINCT state_bird FROM states;
+
+//Now, select the number of unique state birds as bird_count
+  // SELECT COUNT(DISTINCT state_bird) AS bird_count
+  // FROM states;
+
+// Some of the states are reasonably small.
+
+// Select name and population as pop for all states 
+// that have a population between five hundred thousand (500,000) and one million (1,000,000).
+  // SELECT name,
+  //     population AS pop
+  // FROM states
+  // WHERE population BETWEEN 500000 AND 1000000;
+
+//A state's land-to-water ratio could be thought of as the number derived 
+//from dividing its land area by its water area.
+
+//Select the name and land-to-water ratio, rounded, as land_to_water_ratio of all the states.
+      // SELECT name,
+      // ROUND(land_area/water_area) AS land_to_water_ratio
+      // FROM states
+      // ORDER BY land_area/water_area DESC;
+
+// Select the state bird and name of all states ordered first by state bird and 
+// then in ascending order by states' names where states share a state bird.
+  // SELECT state_bird, name
+  // FROM states
+  // ORDER BY state_bird, name;
+
+// Select the name, capital, and century that the state joined the union as century, 
+// sorted by descending order of join date.
+
+// For the purpose of this exercise, use ordinal numerals for the century - in other words, 
+// the year 1787 is in the 18th century, 
+// the year 1852 is in the 19th century, and the year 1920 is in the 20th century.
+//   SELECT name, capital, CASE 
+//   WHEN join_date BETWEEN '1700-01-01' AND '1799-12-31'
+//     THEN '18th' 
+//   WHEN join_date BETWEEN '1800-01-01' AND '1899-12-31'
+//     THEN '19th' 
+//   WHEN join_date BETWEEN '1900-01-01' AND '1999-12-31'
+//     THEN '20th'  
+//   END century
+//   FROM states ORDER by join_date DESC;
+
+// Select the names of all states with populations larger than that of Indiana
+  // SELECT name
+  // FROM states 
+  // WHERE population > (SELECT population
+  // FROM states
+  // WHERE name = 'Indiana')
+  // ORDER BY population DESC;
+
+// Select the names of all states with water areas between those of Nevada and Ohio (non-inclusively)
+
+// SELECT name
+// FROM states
+// WHERE water_area > (SELECT water_area
+//     FROM states
+//     WHERE name = 'Nevada')
+// AND water_area < (SELECT water_area 
+//     FROM states 
+//     WHERE name = 'Ohio');
+
+// Select the name and land area of the largest state that DOESN’T have the Western Meadowlark as its state bird.
+  // SELECT name, land_area FROM (SELECT name, land_area, state_bird 
+  //   FROM states WHERE state_bird != 'Western Meadowlark') AS non_bird_states
+  // ORDER BY land_area DESC
+  // LIMIT 1;
+
+//Select the name and rounded land area in SQUARE MILES, population, rounded population per square mile 
+//as population_per_sq_mi from all states with greater than or equal to 8 letters in their name. 
+//Sort the results in descending order of population per square mile.
+
+// Reminder - to convert square km to square miles, divide by 2.59
+//     SELECT name, 
+//         population, 
+//         ROUND(population/(land_area/2.59)) AS population_per_sq_mi 
+//     FROM states 
+//     WHERE LENGTH(name) >= 8 
+//     ORDER BY population_per_sq_mi DESC;
+
+//using nested SELECTS:
+//     SELECT name, 
+//       ROUND(land_area/2.59) AS sq_mi, 
+//       population, 
+//       ROUND(population/(land_area/2.59)) AS population_per_sq_mi 
+//     FROM (SELECT * FROM states WHERE LENGTH(name) >= 8) AS name_length 
+//     ORDER BY population_per_sq_mi DESC;
+
+// Select the names, populations, and land area in rounded square miles for 
+// states that have a larger population per square mile of land than California.
+
+// Reminder - to convert square km to square miles, divide by 2.59
+// SELECT name, population, 
+//     ROUND(land_area/2.59) AS square_mi
+//     -- ,population/(land_area/2.59) AS pop_per_sq_mi
+// FROM states
+// WHERE population/(land_area/2.59) > (SELECT population/(land_area/2.59)
+//     FROM states WHERE name = 'California')
+// ORDER BY population/(land_area/2.59) DESC;
+
+//or ---
+// SELECT name, 
+  // ROUND(land_area/2.59) AS sq_mi, 
+  // population  
+// FROM states 
+// WHERE ROUND(population/(land_area/2.59)) > 
+//    (SELECT ROUND(population/(land_area/2.59)) 
+// FROM states WHERE name = 'California');
+
+//2 TABLES!!
+
+// Select the names and business contacts from all companies 
+// that are in a state that matches the same two-letter postal code as the state of Delaware.
+
+  // SELECT business_name, contact_name
+  // FROM corporate_accounts
+  // WHERE business_state = (SELECT usps_code FROM states
+  // WHERE name = 'Delaware');
+
+//   New England is an area of the North-Eastern United States comprised of six states: 
+//   Connecticut, Maine, Massachusetts, New Hampshire, Rhode Island, and Vermont.
+
+// Select the names and states of all companies operating in New England sorted in 
+// alphabetical order first of of their business_state and then by their business names.
+//   SELECT business_name, business_state
+//   FROM corporate_accounts
+//   WHERE business_state 
+      //IN(SELECT usps_code FROM states
+//       WHERE name 
+//       IN('Connecticut', 'Maine', 
+//       'Massachusetts', 'New Hampshire', 
+//       'Rhode Island', 'Vermont'))
+//   ORDER BY business_state, business_name;
+
+//ANSWER:
+// SELECT business_name, business_state 
+// FROM corporate_accounts 
+// WHERE business_state 
+// IN (SELECT usps_code FROM states 
+//   WHERE name IN ( 'Connecticut', 'Maine', 'Massachusetts', 'New Hampshire', 'Rhode Island', 'Vermont')) 
+// ORDER BY business_state, business_name;
+
+
+// Select the name and capital of all states that have a state bird in the following list of popular birds:
+
+// Western Meadowlark
+// Northern Cardinal
+// Northern Mockingbird
+// American Robin
+// SELECT name, capital 
+// FROM states
+// WHERE state_bird
+// IN ('Western Meadowlark', 'Northern Cardinal', 
+// 'Northern Mockingbird', 'American Robin');
+
+/*
+--------The code is mightier than the sword----------
+----------------------//\\
+---------------------// ¤ \\
+---------------------\\ ¤ //
+---------------------- \\//
+-------------------- (___)
+---------------------(___)
+---------------------(___)
+---------------------(___)_________
+--------\_____/\__/----\__/\_____/
+------------\ _°_[------------]_ _° /
+----------------\_°_¤ ---- ¤_°_/
+--------------------\ ° /
+---------------------|\_°_/|
+---------------------[|\_/|]
+---------------------[|[¤]|]
+---------------------[|;¤;|]
+---------------------[;;¤;;]
+--------------------;;;;¤]|]\
+-------------------;;;;;¤]|]-\
+------------------;;;;;[¤]|]--\
+-----------------;;;;;|[¤]|]---\
+----------------;;;;;[|[¤]|]|---|
+---------------;;;;;[|[¤]|]|---|
+----------------;;;;[|[¤]|/---/
+-----------------;;;[|[¤]/---/
+------------------;;[|[¤/---/
+-------------------;[|[/---/
+--------------------[|/---/
+---------------------/---/
+--------------------/---/|]
+-------------------/---/]|];
+------------------/---/¤]|];;
+-----------------|---|[¤]|];;;
+-----------------|---|[¤]|];;;
+------------------\--|[¤]|];;
+-------------------\-|[¤]|];
+---------------------\|[¤]|]
+----------------------\\¤//
+-----------------------\|/
+------------------------V
+
+*/
